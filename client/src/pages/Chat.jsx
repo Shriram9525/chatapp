@@ -7,8 +7,6 @@ const EMOJIS = ['😀', '😂', '🥺', '😭', '🥰', '😍', '😎', '😡', 
 import { format } from 'date-fns';
 import socket from '../socket';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 export default function Chat({ user }) {
     const { username, avatar, color } = user;
     const { roomId } = useParams();
@@ -38,7 +36,7 @@ export default function Chat({ user }) {
     useEffect(() => {
         const verifyRoomAccess = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/rooms/${roomId}/verify`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/${roomId}/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: '' })
@@ -62,7 +60,7 @@ export default function Chat({ user }) {
         e.preventDefault();
         setAuthError('');
         try {
-            const res = await fetch(`${API_URL}/api/rooms/${roomId}/verify`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/${roomId}/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: roomPassword })
@@ -84,7 +82,7 @@ export default function Chat({ user }) {
         // 1. Fetch historical messages
         const fetchMessages = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/rooms/${roomId}/messages`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/${roomId}/messages`);
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Fetch error');
                 setMessages(Array.isArray(data) ? data : []);
@@ -291,7 +289,7 @@ export default function Chat({ user }) {
                         </div>
                     ) : (
                         <>
-                            {messages.map((msg, idx) => {
+                            {(Array.isArray(messages) ? messages : []).map((msg, idx) => {
                                 const isMine = msg.username === username;
                                 const showAvatar = !isMine && (idx === 0 || messages[idx - 1].username !== msg.username);
 
@@ -440,7 +438,7 @@ export default function Chat({ user }) {
                         <h3 className="text-[11px] font-bold text-chat-text-muted uppercase tracking-wider px-2 mb-3">
                             Online — {onlineUsers.length}
                         </h3>
-                        {onlineUsers.map((ou, i) => (
+                        {(Array.isArray(onlineUsers) ? onlineUsers : []).map((ou, i) => (
                             <div key={ou.username + i} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors group cursor-default">
                                 <div className="relative">
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center border shadow-inner transition-colors" style={{ borderColor: ou.color || '#7C3AED' }}>

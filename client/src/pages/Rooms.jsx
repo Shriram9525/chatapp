@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Hash, LogOut, Loader2, Trash2, Lock } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 export default function Rooms({ user, setUser }) {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -20,7 +18,7 @@ export default function Rooms({ user, setUser }) {
 
     const fetchRooms = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/rooms`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms`);
             const data = await res.json();
             setRooms(data);
         } catch (error) {
@@ -35,7 +33,7 @@ export default function Rooms({ user, setUser }) {
         if (!newRoomName.trim()) return;
 
         try {
-            const res = await fetch(`${API_URL}/api/rooms`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newRoomName, description: newRoomDesc, createdBy: user.username, isPrivate, password }),
@@ -62,7 +60,7 @@ export default function Rooms({ user, setUser }) {
         setRooms((prev) => prev.filter(r => r._id !== roomId));
 
         try {
-            const res = await fetch(`${API_URL}/api/rooms/${roomId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/${roomId}`, {
                 method: 'DELETE',
             });
             if (!res.ok) throw new Error('Failed to delete room from server');
@@ -157,7 +155,7 @@ export default function Rooms({ user, setUser }) {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {rooms.map((room) => (
+                                {(Array.isArray(rooms) ? rooms : []).map((room) => (
                                     <div
                                         key={room._id}
                                         onClick={() => navigate(`/chat/${room._id}?name=${encodeURIComponent(room.name)}`)}
